@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmail(createUserRequest.getEmail());
         userEntity.setPassword(createUserRequest.getPassword());
         userEntity.setAge(createUserRequest.getAge());
-        userEntity.setUserType(createUserRequest.getUserType());
+        //userEntity.setUserType(createUserRequest.getUserType());
         return userRepository.save(userEntity);
 
     }

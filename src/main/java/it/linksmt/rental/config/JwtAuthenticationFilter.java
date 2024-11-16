@@ -72,12 +72,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                     SecurityBean securityBean = new SecurityBean();
                     securityBean.setId(userDetails.getId());
                     securityBean.setUsername(userDetails.getUsername());
-                    securityBean.setName(userDetails.getUsername());
+                    securityBean.setName(userDetails.getName());
                     securityBean.setSurname(userDetails.getSurname());
                     securityBean.setEmail(userDetails.getEmail());
                     securityBean.setPassword(userDetails.getPassword());
                     securityBean.setAge(userDetails.getAge());
                     securityBean.setUserType(userDetails.getUserType());
+                    securityBean.setAuthorities(userDetails.getAuthorities());
 
 
                     SecurityContext.set(securityBean);

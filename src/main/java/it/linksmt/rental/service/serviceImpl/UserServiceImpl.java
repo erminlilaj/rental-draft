@@ -4,8 +4,12 @@ import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.UpdateUserRequest;
 import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.repository.UserRepository;
+import it.linksmt.rental.security.SecurityBean;
+import it.linksmt.rental.security.SecurityContext;
+import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +19,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+    public AuthenticationService authenticationService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService) {
         this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -41,6 +47,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(Long id) {
+        SecurityBean currentUser = SecurityContext.get();
+
+        if (!authenticationService.isAdmin(currentUser)) {
+            throw new AccessDeniedException("Only admins can delete users");
+        }
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;

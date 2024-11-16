@@ -3,11 +3,17 @@ package it.linksmt.rental.controller;
 import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
+import it.linksmt.rental.enums.UserType;
+import it.linksmt.rental.security.SecurityBean;
+import it.linksmt.rental.security.SecurityContext;
+import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +26,11 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
+
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<VehicleEntity> createVehicle(@RequestBody CreateVehicleRequest createVehicleRequest) {
-        VehicleEntity createdVehicle= vehicleService.createVehicle(createVehicleRequest);
+     VehicleEntity createdVehicle= vehicleService.createVehicle(createVehicleRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
     }
 

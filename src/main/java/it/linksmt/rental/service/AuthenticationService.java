@@ -4,6 +4,7 @@ import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
 import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.repository.UserRepository;
+import it.linksmt.rental.security.SecurityBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +33,7 @@ public class AuthenticationService {
                 String password=createUserRequest.getPassword()+salt;
                 user.setPassword(passwordEncoder.encode(password));
                 user.setAge(createUserRequest.getAge());
+                user.setUserType(createUserRequest.getUserType());
         return userRepository.save(user);
     }
 public UserEntity authenticate(LoginUserRequest loginUserRequest){
@@ -47,6 +49,10 @@ public UserEntity authenticate(LoginUserRequest loginUserRequest){
                 .orElseThrow();
 }
 
+    public boolean isAdmin(SecurityBean currentUser) {
+        return currentUser.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+    }
 
 
 }

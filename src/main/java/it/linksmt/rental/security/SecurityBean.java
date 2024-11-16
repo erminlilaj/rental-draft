@@ -6,8 +6,10 @@ import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -21,5 +23,6 @@ public class SecurityBean {
     private String password;
     private int age;
     private UserType userType;
+    private Collection<? extends GrantedAuthority> authorities;
 
 }

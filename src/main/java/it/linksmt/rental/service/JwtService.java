@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 import it.linksmt.rental.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,9 @@ public class JwtService {
         claims.put("email", userEntity.getEmail());
         claims.put("age", userEntity.getAge());
         claims.put("userType", userEntity.getUserType().name());
+        claims.put("roles", userEntity.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList());
 
         return buildToken(claims, userEntity.getUsername(), jwtExpiration);
     }

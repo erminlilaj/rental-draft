@@ -4,7 +4,11 @@ import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.repository.VehicleRepository;
+import it.linksmt.rental.security.SecurityBean;
+import it.linksmt.rental.security.SecurityContext;
+import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.VehicleService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +16,20 @@ import java.util.List;
 public class VehicleServiceImpl implements VehicleService {
 
     VehicleRepository vehicleRepository;
+    public AuthenticationService authenticationService;
 
-    public VehicleServiceImpl(VehicleRepository vehicleRepository) {
+    public VehicleServiceImpl(VehicleRepository vehicleRepository, AuthenticationService authenticationService) {
         this.vehicleRepository = vehicleRepository;
+        this.authenticationService = authenticationService;
     }
 
     @Override
     public VehicleEntity createVehicle(CreateVehicleRequest createVehicleRequest) {
+        SecurityBean currentUser = SecurityContext.get();
+
+        if (!authenticationService.isAdmin(currentUser)) {
+            throw new AccessDeniedException("Only admins can create vehicles.");
+        }
         VehicleEntity vehicleEntity = new VehicleEntity();
         vehicleEntity.setBrand(createVehicleRequest.getBrand());
         vehicleEntity.setModel(createVehicleRequest.getModel());
@@ -47,6 +58,11 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public boolean deleteVehicle(Long id) {
+        SecurityBean currentUser = SecurityContext.get();
+
+        if (!authenticationService.isAdmin(currentUser)) {
+            throw new AccessDeniedException("Only admins can delete vehicles.");
+        }
        if(vehicleRepository.existsById(id)) {
            vehicleRepository.deleteById(id);
            return true;
@@ -56,6 +72,11 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public VehicleEntity updateVehicle(Long id, UpdateVehicleRequest updateVehicleRequest) {
+        SecurityBean currentUser = SecurityContext.get();
+
+        if (!authenticationService.isAdmin(currentUser)) {
+            throw new AccessDeniedException("Only admins can update vehicles.");
+        }
 //        if(!vehicleRepository.existsById(id)) {
 //            //todo throw exp
 //            return null;

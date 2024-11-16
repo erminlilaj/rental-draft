@@ -3,15 +3,20 @@ package it.linksmt.rental.service.serviceImpl;
 import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
+import it.linksmt.rental.enums.ErrorCode;
+import it.linksmt.rental.exception.BusinessException;
 import it.linksmt.rental.repository.VehicleRepository;
 import it.linksmt.rental.security.SecurityBean;
 import it.linksmt.rental.security.SecurityContext;
 import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.VehicleService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class VehicleServiceImpl implements VehicleService {
 
@@ -28,32 +33,66 @@ public class VehicleServiceImpl implements VehicleService {
         SecurityBean currentUser = SecurityContext.get();
 
         if (!authenticationService.isAdmin(currentUser)) {
-            throw new AccessDeniedException("Only admins can create vehicles.");
+            //throw new AccessDeniedException(
+            throw new BusinessException(
+                    ErrorCode.UNAUTHORIZED_ACCESS,
+                            "You do not have access to create a vehicle"
+                    );
         }
-        VehicleEntity vehicleEntity = new VehicleEntity();
-        vehicleEntity.setBrand(createVehicleRequest.getBrand());
-        vehicleEntity.setModel(createVehicleRequest.getModel());
-        vehicleEntity.setYear(createVehicleRequest.getYear());
-        vehicleEntity.setGearboxType(createVehicleRequest.getGearboxType());
-        vehicleEntity.setFuelType(createVehicleRequest.getFuelType());
-        vehicleEntity.setColor(createVehicleRequest.getColor());
-        vehicleEntity.setVehicleStatus(createVehicleRequest.getVehicleStatus());
-        vehicleEntity.setDailyFee(createVehicleRequest.getDailyFee());
-       return vehicleRepository.save(vehicleEntity);
+        try {
+            VehicleEntity vehicleEntity = new VehicleEntity();
+            vehicleEntity.setBrand(createVehicleRequest.getBrand());
+            vehicleEntity.setModel(createVehicleRequest.getModel());
+            vehicleEntity.setYear(createVehicleRequest.getYear());
+            vehicleEntity.setGearboxType(createVehicleRequest.getGearboxType());
+            vehicleEntity.setFuelType(createVehicleRequest.getFuelType());
+            vehicleEntity.setColor(createVehicleRequest.getColor());
+            vehicleEntity.setVehicleStatus(createVehicleRequest.getVehicleStatus());
+            vehicleEntity.setDailyFee(createVehicleRequest.getDailyFee());
+            return vehicleRepository.save(vehicleEntity);
+        }
+        catch (Exception e) {
+            throw new BusinessException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            "Error occured while creating the vehicle"
+            );
+        }
     }
 
     @Override
     public List<VehicleEntity> findAllVehicle() {
-        return vehicleRepository.findAll();
+        if(vehicleRepository.findAll().isEmpty()) {
+            throw new BusinessException(
+                    ErrorCode.VEHICLE_NOT_FOUND,
+                    "No vehicle found"
+            );
+        }
+        try {
+            return vehicleRepository.findAll();
+        }catch (Exception e) {
+            throw new BusinessException(
+                    ErrorCode.INTERNAL_SERVER_ERROR,
+                    "Error occured while finding all vehicles"
+            );
+        }
     }
 
     @Override
     public VehicleEntity findVehicleById(Long id) {
-        //if (vehicleRepository.existsById(id)) {
+        if (!vehicleRepository.existsById(id)) {
+            throw new BusinessException(
+                    ErrorCode.VEHICLE_NOT_FOUND,
+                    "No vehicle found with id: " + id
+            );
+        }
+        try {
             return vehicleRepository.findById(id).orElse(null);
-
-        //todo
-        //return null;
+        }catch (Exception e) {
+            throw new BusinessException(
+                    ErrorCode.INTERNAL_SERVER_ERROR,
+                    "Error occured while finding vehicle with id: " + id
+            );
+        }
     }
 
     @Override
@@ -61,30 +100,67 @@ public class VehicleServiceImpl implements VehicleService {
         SecurityBean currentUser = SecurityContext.get();
 
         if (!authenticationService.isAdmin(currentUser)) {
-            throw new AccessDeniedException("Only admins can delete vehicles.");
+            throw new BusinessException(
+                    ErrorCode.UNAUTHORIZED_ACCESS,
+                    "You do not have access to delete a vehicle"
+            );
         }
-       if(vehicleRepository.existsById(id)) {
-           vehicleRepository.deleteById(id);
-           return true;
+       if(!vehicleRepository.existsById(id)) {
+           throw new BusinessException(
+                   ErrorCode.VEHICLE_NOT_FOUND,
+                   "No vehicle found with id: " + id
+           );
        }
-       return false;
+       try{
+           vehicleRepository.deleteById(id);
+          return true;
+       }catch (Exception e) {
+           throw new BusinessException(
+                   ErrorCode.INTERNAL_SERVER_ERROR,
+                   "Error occured while deleting a vehicle"
+           );
+       }
+
     }
 
     @Override
     public VehicleEntity updateVehicle(Long id, UpdateVehicleRequest updateVehicleRequest) {
         SecurityBean currentUser = SecurityContext.get();
 
+
         if (!authenticationService.isAdmin(currentUser)) {
-            throw new AccessDeniedException("Only admins can update vehicles.");
+            throw new BusinessException(
+                    ErrorCode.UNAUTHORIZED_ACCESS,
+                    "You do not have access to update a vehicle."
+            );
         }
-//        if(!vehicleRepository.existsById(id)) {
-//            //todo throw exp
-//            return null;
-//        }
-        VehicleEntity vehicle = findVehicleById(id);
-        vehicle.setModel(updateVehicleRequest.getModel());
-        vehicle.setColor(updateVehicleRequest.getColor());
-        vehicle.setDailyFee(updateVehicleRequest.getDailyFee());
-        return vehicleRepository.save(vehicle);
+//todo if null
+        VehicleEntity vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.VEHICLE_NOT_FOUND,
+                        "No vehicle found with id: " + id
+                ));
+        try {
+            Optional.ofNullable(updateVehicleRequest.getModel())
+                    .ifPresent(vehicle::setModel);
+            Optional.ofNullable(updateVehicleRequest.getColor())
+                    .ifPresent(vehicle::setColor);
+//            if (updateVehicleRequest.getDailyFee() != null) {
+//                if (updateVehicleRequest.getDailyFee() < 0) {
+//                    throw new BusinessException(
+//                            ErrorCode.BAD_REQUEST,
+//                            "Daily fee cannot be negative."
+//                    );
+//                }
+//                vehicle.setDailyFee(updateVehicleRequest.getDailyFee());
+//            }
+            return vehicleRepository.save(vehicle);
+        }  catch (Exception e) {
+            throw new BusinessException(
+                    ErrorCode.INTERNAL_SERVER_ERROR,
+                    "An error occurred while updating the vehicle: "
+            );
+        }
     }
+
 }

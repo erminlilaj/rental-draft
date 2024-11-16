@@ -4,6 +4,7 @@ import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.UserType;
+import it.linksmt.rental.exception.BusinessException;
 import it.linksmt.rental.security.SecurityBean;
 import it.linksmt.rental.security.SecurityContext;
 import it.linksmt.rental.service.AuthenticationService;
@@ -29,43 +30,59 @@ public class VehicleController {
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public ResponseEntity<VehicleEntity> createVehicle(@RequestBody CreateVehicleRequest createVehicleRequest) {
-     VehicleEntity createdVehicle= vehicleService.createVehicle(createVehicleRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
+    public ResponseEntity<?> createVehicle(@RequestBody CreateVehicleRequest createVehicleRequest) {
+     try {
+         VehicleEntity createdVehicle = vehicleService.createVehicle(createVehicleRequest);
+         return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
+     } catch (BusinessException e) {
+        throw e;
+     }
     }
 
     @GetMapping
     public ResponseEntity<List<VehicleEntity>> getAllVehicles() {
-        List<VehicleEntity> vehicleList = vehicleService.findAllVehicle();
-        if (vehicleList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(vehicleList); // Return an empty list
+        try {
+            List<VehicleEntity> vehicleList = vehicleService.findAllVehicle();
+
+            return ResponseEntity.status(HttpStatus.OK).body(vehicleList);
+        }catch (BusinessException e) {
+            throw e;
         }
-        return ResponseEntity.status(HttpStatus.OK).body(vehicleList);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<VehicleEntity> getVehicleById(@PathVariable Long id) {
-        VehicleEntity vehicle = vehicleService.findVehicleById(id);
-        if (vehicle == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // No body for NOT_FOUND
+        try {
+            VehicleEntity vehicle = vehicleService.findVehicleById(id);
+
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+        }catch (BusinessException e) {
+            throw e;
         }
-        return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
-        if (vehicleService.deleteVehicle(id)) {
-            return ResponseEntity.status(HttpStatus.OK).build(); // No body for success
+        try{
+     vehicleService.deleteVehicle(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (BusinessException e) {
+            throw e;
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // No body for NOT_FOUND
+
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VehicleEntity> updateVehicle(@PathVariable Long id, @RequestBody UpdateVehicleRequest updateVehicleRequest) {
-        VehicleEntity vehicle= vehicleService.updateVehicle(id,updateVehicleRequest);
+        try {
+            VehicleEntity vehicle = vehicleService.updateVehicle(id, updateVehicleRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+        }catch (BusinessException e) {
+            throw e;
+        }
 }
 
 

@@ -3,9 +3,9 @@ package it.linksmt.rental.controller;
 import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
 import it.linksmt.rental.entity.UserEntity;
+import it.linksmt.rental.exception.BusinessException;
 import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.JwtService;
-import it.linksmt.rental.controller.LoginResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,18 +24,27 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
     @PostMapping("/signup")
-    public ResponseEntity<UserEntity> register(@RequestBody CreateUserRequest createUserRequest) {
-        UserEntity registeredUser= authenticationService.signUp(createUserRequest);
-    return ResponseEntity.ok().body(registeredUser);
+    public ResponseEntity<?> register(@RequestBody CreateUserRequest createUserRequest) {
+        try {
+            UserEntity registeredUser = authenticationService.signUp(createUserRequest);
+            return ResponseEntity.ok().body(registeredUser);
+        } catch (BusinessException e) {
+                throw e;
+        }
     }
     @PostMapping("/login")
-    public ResponseEntity<String> authenticate(@RequestBody LoginUserRequest loginUserRequest){
-        UserEntity user = authenticationService.authenticate(loginUserRequest);
-        String token = jwtService.generateToken(user);
+    public ResponseEntity<?> authenticate(@RequestBody LoginUserRequest loginUserRequest){
+       try {
+           UserEntity user = authenticationService.authenticate(loginUserRequest);
+           String token = jwtService.generateToken(user);
 //        LoginResponse loginResponse=new LoginResponse();
 //        loginResponse.setToken(token);
 //        loginResponse.setExpiresIn(jwtService.getExpirationTime());
-        return ResponseEntity.ok(token);
+           return ResponseEntity.ok(token);
+       }
+       catch (BusinessException e) {
+           throw e;
+       }
     }
 
 }

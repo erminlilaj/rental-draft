@@ -131,27 +131,11 @@ public class VehicleServiceImpl implements VehicleService {
                         ErrorCode.VEHICLE_NOT_FOUND,
                         "No vehicle found with id: " + id
                 ));
-        try {
-            Optional.ofNullable(updateVehicleRequest.getModel())
-                    .ifPresent(vehicle::setModel);
-            Optional.ofNullable(updateVehicleRequest.getColor())
-                    .ifPresent(vehicle::setColor);
-//            if (updateVehicleRequest.getDailyFee() != null) {
-//                if (updateVehicleRequest.getDailyFee() < 0) {
-//                    throw new BusinessException(
-//                            ErrorCode.BAD_REQUEST,
-//                            "Daily fee cannot be negative."
-//                    );
-//                }
-//                vehicle.setDailyFee(updateVehicleRequest.getDailyFee());
-//            }
-            return vehicleRepository.save(vehicle);
-        }  catch (Exception e) {
-            throw new ServiceException(
-                    ErrorCode.INTERNAL_SERVER_ERROR,
-                    "An error occurred while updating the vehicle: "
-            );
-        }
+        vehicle.setModel(updateVehicleRequest.getModel());
+        vehicle.setColor(updateVehicleRequest.getColor());
+        vehicle.setDailyFee(updateVehicleRequest.getDailyFee());
+        vehicle.setVehicleStatus(updateVehicleRequest.getVehicleStatus());
+        return vehicleRepository.save(vehicle);
     }
 
     @Override

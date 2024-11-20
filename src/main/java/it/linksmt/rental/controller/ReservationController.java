@@ -6,6 +6,7 @@ import it.linksmt.rental.dto.ReservationStatisticsResponse;
 import it.linksmt.rental.entity.ReservationEntity;
 import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,7 +23,7 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping("/create")
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody CreateReservationRequest reservationRequest) {
+    public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody CreateReservationRequest reservationRequest) {
             ReservationResponse createdReservation = reservationService.createReservation(reservationRequest);
             return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(createdReservation);
     }
@@ -34,14 +35,14 @@ public class ReservationController {
         return ResponseEntity.ok(cancelledReservation);
     }
     @GetMapping
-    public ResponseEntity<List<ReservationEntity>> getAllReservations() {
-        List<ReservationEntity> reservations = reservationService.findAllReservations();
+    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
+        List<ReservationResponse> reservations = reservationService.findAllReservations();
         return ResponseEntity.status(HttpStatus.OK).body(reservations);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReservationEntity> getReservationById(@PathVariable("id") Long id) {
-       ReservationEntity reservations=reservationService.getReservationById(id);
+    public ResponseEntity<ReservationResponse> getReservationById(@PathVariable("id") Long id) {
+       ReservationResponse reservations=reservationService.getReservationById(id);
         return ResponseEntity.status(HttpStatus.OK).body(reservations);
     }
     @GetMapping("/statistics/{MM-yyyy}")

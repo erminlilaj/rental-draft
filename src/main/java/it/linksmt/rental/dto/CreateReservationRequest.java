@@ -1,10 +1,9 @@
 package it.linksmt.rental.dto;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
-
-import javax.validation.constraints.FutureOrPresent;
 
 
+
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,12 +18,12 @@ public class CreateReservationRequest {
 
     private Long vehicleId;
 
-    //@NotNull(message = "Start date cannot be null")
+    @NotNull(message = "Start date cannot be null")
    // @DateTimeFormat(pattern = "dd/MM/yyyy")
 //@FutureOrPresent(message = "Start date cannot be in the past")
     private LocalDateTime startDate;
 
-   // @NotNull(message = "End date cannot be null")
+    @NotNull(message = "End date cannot be null")
     //@DateTimeFormat(pattern = "dd/MM/yyyy")
    // @Future(message = "End date must be in the future")
     private LocalDateTime endDate;

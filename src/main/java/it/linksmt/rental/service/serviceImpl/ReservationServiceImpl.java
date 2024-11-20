@@ -22,7 +22,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -103,23 +105,34 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationEntity getReservationById(Long id) {
+    public ReservationResponse getReservationById(Long id) {
 
         ReservationEntity reservationEntity = reservationRepository.findById(id).orElse(null);
-//                .orElseThrow(() -> new ServiceException(
-//                        ErrorCode.RESERVATION_NOT_FOUND,
-//                        "Reservation not found"
-//                ));
-
-        return reservationEntity;
-        // return convertReservationToResponse(reservationEntity);
+        if(reservationEntity==null) {
+            throw new ServiceException(
+                    ErrorCode.RESERVATION_NOT_FOUND,
+                    "Reservation not found"
+            );
+        }
+        return convertReservationToResponse(reservationEntity);
     }
 
     @Override
-    public List<ReservationEntity> findAllReservations() {
-        System.out.println("getting reservation");
-        return reservationRepository.findAll();
+    public List<ReservationResponse> findAllReservations() {
+       List<ReservationEntity> reservationsList=reservationRepository.findAll();
+       if(reservationsList==null){
+           throw new ServiceException(
+                   ErrorCode.RESERVATION_NOT_FOUND,
+                   "There is no reservations"
+           );
+       }
+        return convertReservationListToResponse(reservationsList);
     }
+public List<ReservationResponse> convertReservationListToResponse(List<ReservationEntity> reservationList) {
+return reservationList.stream()
+        .map(reservationEntity -> convertReservationToResponse(reservationEntity))
+        .collect(Collectors.toUnmodifiableList());
+}
 
 
     @Override

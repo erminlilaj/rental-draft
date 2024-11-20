@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import it.linksmt.rental.entity.UserEntity;
+import it.linksmt.rental.enums.ErrorCode;
+import it.linksmt.rental.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,12 +28,24 @@ public class JwtService {
     private long jwtExpiration;
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        }catch (Exception e) {
+            throw new ServiceException(ErrorCode.INVALID_TOKEN,
+                    "Invalid token");
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(token);
+            return claimsResolver.apply(claims);
+        } catch (Exception e) {
+            throw new ServiceException(
+                    ErrorCode.INVALID_TOKEN,
+                    "Invalid token"
+            );
+        }
     }
 
     public String generateToken(UserEntity userEntity) {
@@ -69,7 +83,16 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+
+        if (!username.equals(userDetails.getUsername()) || isTokenExpired(token)) {
+
+            throw new ServiceException(
+                    ErrorCode.INVALID_TOKEN
+            );
+
+        }
+
+        return true;
     }
 
     private boolean isTokenExpired(String token) {

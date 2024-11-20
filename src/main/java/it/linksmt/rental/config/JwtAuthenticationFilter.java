@@ -50,8 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             return;
         }
 
-        try {
+
             final String jwt = authHeader.substring(7);
+
             final String userUsername = jwtService.extractUsername(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,13 +73,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                     SecurityBean securityBean = new SecurityBean();
                     securityBean.setId(userDetails.getId());
                     securityBean.setUsername(userDetails.getUsername());
-                    securityBean.setName(userDetails.getName());
-                    securityBean.setSurname(userDetails.getSurname());
-                    securityBean.setEmail(userDetails.getEmail());
-                    securityBean.setPassword(userDetails.getPassword());
-                    securityBean.setAge(userDetails.getAge());
-                    securityBean.setUserType(userDetails.getUserType());
-                    securityBean.setAuthorities(userDetails.getAuthorities());
+//                    securityBean.setName(userDetails.getName());
+//                    securityBean.setSurname(userDetails.getSurname());
+//                    securityBean.setEmail(userDetails.getEmail());
+//                    securityBean.setPassword(userDetails.getPassword());
+//                    securityBean.setAge(userDetails.getAge());
+//                    securityBean.setUserType(userDetails.getUserType());
+                      securityBean.setAuthorities(userDetails.getAuthorities());
 
 
                     SecurityContext.set(securityBean);
@@ -88,8 +89,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             }
 
             filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
-        }
+
     }
 }

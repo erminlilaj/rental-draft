@@ -10,6 +10,7 @@ import it.linksmt.rental.security.SecurityBean;
 import it.linksmt.rental.security.SecurityContext;
 import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.VehicleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,14 +77,12 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleEntity> updateVehicle(@PathVariable Long id, @RequestBody UpdateVehicleRequest updateVehicleRequest) {
-        try {
+    public ResponseEntity<VehicleEntity> updateVehicle(@PathVariable Long id,@Valid @RequestBody UpdateVehicleRequest updateVehicleRequest) {
+
             VehicleEntity vehicle = vehicleService.updateVehicle(id, updateVehicleRequest);
 
             return ResponseEntity.status(HttpStatus.OK).body(vehicle);
-        }catch (ServiceException e) {
-            throw e;
-        }
+
 }
 
 

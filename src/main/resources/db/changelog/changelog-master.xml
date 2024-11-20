@@ -8,4 +8,5 @@
     <!-- Reference other changelogs here -->
     <include file="db/changelog/users-changelog.xml"/>
     <include file="db/changelog/vehicles-changelog.xml"/>
+    <include file="db/changelog/reservations-changelog.xml"/>
 </databaseChangeLog>

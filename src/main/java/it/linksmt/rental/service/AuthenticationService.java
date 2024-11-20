@@ -4,13 +4,15 @@ import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
 import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.enums.ErrorCode;
-import it.linksmt.rental.exception.AuthenticationException;
-import it.linksmt.rental.exception.BusinessException;
+
+
+import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.repository.UserRepository;
 import it.linksmt.rental.security.SecurityBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +31,14 @@ public class AuthenticationService {
 
     public UserEntity signUp(CreateUserRequest createUserRequest) {
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
-            throw new BusinessException(
+            throw new ServiceException(
                     ErrorCode.USER_ALREADY_EXISTS,
                     "User already exists with username: " + createUserRequest.getUsername()
             );
         }
 
         if (userRepository.existsByEmail(createUserRequest.getEmail())) {
-            throw new BusinessException(
+            throw new ServiceException(
                     ErrorCode.USER_ALREADY_EXISTS,
                     "User already exists with email: " + createUserRequest.getEmail()
             );
@@ -56,7 +58,7 @@ public class AuthenticationService {
 
             return userRepository.save(user);
         } catch (Exception e) {
-            throw new BusinessException(
+            throw new ServiceException(
                     ErrorCode.INTERNAL_SERVER_ERROR,
                     "Error occurred while creating user"
             );
@@ -75,18 +77,18 @@ public class AuthenticationService {
             );
 
             return userRepository.findByUsername(loginUserRequest.getUsername())
-                    .orElseThrow(() -> new AuthenticationException(
+                    .orElseThrow(() -> new ServiceException(
                             ErrorCode.USER_NOT_FOUND,
                             "User not found with username: " + loginUserRequest.getUsername()
                     ));
 
         } catch (BadCredentialsException e) {
-            throw new AuthenticationException(
+            throw new ServiceException(
                     ErrorCode.INVALID_CREDENTIALS,
                     "Invalid username or password"
             );
         } catch (Exception e) {
-            throw new AuthenticationException(
+            throw new ServiceException(
                     ErrorCode.INTERNAL_SERVER_ERROR,
                     "Authentication failed"
             );
@@ -97,6 +99,12 @@ public class AuthenticationService {
         return currentUser.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
-
+    public Long getCurrentUserId() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ServiceException(ErrorCode.UNAUTHORIZED_ACCESS,
+                        "User not loogged in"))
+                .getId();
+    }
 
 }

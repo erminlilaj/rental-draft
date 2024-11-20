@@ -4,7 +4,8 @@ import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.UserType;
-import it.linksmt.rental.exception.BusinessException;
+
+import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.security.SecurityBean;
 import it.linksmt.rental.security.SecurityContext;
 import it.linksmt.rental.service.AuthenticationService;
@@ -34,7 +35,7 @@ public class VehicleController {
      try {
          VehicleEntity createdVehicle = vehicleService.createVehicle(createVehicleRequest);
          return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
-     } catch (BusinessException e) {
+     } catch (ServiceException e) {
         throw e;
      }
     }
@@ -45,7 +46,7 @@ public class VehicleController {
             List<VehicleEntity> vehicleList = vehicleService.findAllVehicle();
 
             return ResponseEntity.status(HttpStatus.OK).body(vehicleList);
-        }catch (BusinessException e) {
+        }catch (ServiceException e) {
             throw e;
         }
     }
@@ -57,7 +58,7 @@ public class VehicleController {
             VehicleEntity vehicle = vehicleService.findVehicleById(id);
 
             return ResponseEntity.status(HttpStatus.OK).body(vehicle);
-        }catch (BusinessException e) {
+        }catch (ServiceException e) {
             throw e;
         }
 
@@ -68,7 +69,7 @@ public class VehicleController {
         try{
      vehicleService.deleteVehicle(id);
             return ResponseEntity.status(HttpStatus.OK).build();
-        }catch (BusinessException e) {
+        }catch (ServiceException e) {
             throw e;
         }
 
@@ -80,7 +81,7 @@ public class VehicleController {
             VehicleEntity vehicle = vehicleService.updateVehicle(id, updateVehicleRequest);
 
             return ResponseEntity.status(HttpStatus.OK).body(vehicle);
-        }catch (BusinessException e) {
+        }catch (ServiceException e) {
             throw e;
         }
 }

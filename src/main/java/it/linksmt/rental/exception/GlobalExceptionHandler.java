@@ -4,8 +4,6 @@ import it.linksmt.rental.dto.ErrorResponse;
 import it.linksmt.rental.enums.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,10 +15,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle our custom RentalApiException and its subclasses
-    @ExceptionHandler(RentalApiException.class)
+    // Handle our custom ServiceException and its subclasses
+    @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ErrorResponse> handleRentalApiException(
-            RentalApiException ex,
+            ServiceException ex,
             WebRequest request) {
 
         HttpStatus httpStatus = getHttpStatusForErrorCode(ex.getErrorCode());
@@ -67,10 +65,10 @@ public class GlobalExceptionHandler {
             case 103 -> HttpStatus.FORBIDDEN;        // UNAUTHORIZED_ACCESS
 
             case 201 -> HttpStatus.NOT_FOUND;        // USER_NOT_FOUND
-            case 202 -> HttpStatus.CONFLICT;         // USER_ALREADY_EXISTS
+            case 202, 602-> HttpStatus.CONFLICT;         // USER_ALREADY_EXISTS
 
             case 301 -> HttpStatus.NOT_FOUND;        // VEHICLE_NOT_FOUND
-            case 302 -> HttpStatus.CONFLICT;         // VEHICLE_ALREADY_BOOKED
+            case 302 -> HttpStatus.CONFLICT;         // VEHICLE_NOT_AVAILABLE
 
             case 401, 402 -> HttpStatus.BAD_REQUEST; // VALIDATION_ERROR, BAD_REQUEST
 

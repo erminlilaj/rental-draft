@@ -5,7 +5,6 @@ import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.entity.VehicleEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface VehicleService {
     VehicleEntity createVehicle(CreateVehicleRequest createVehicleRequest);
@@ -17,4 +16,6 @@ public interface VehicleService {
     boolean deleteVehicle(Long id);
 
     VehicleEntity updateVehicle(Long id, UpdateVehicleRequest updateVehicleRequest);
+
+    double getVehiclePrice(Long id);
 }

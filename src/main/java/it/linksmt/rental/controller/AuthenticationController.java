@@ -3,7 +3,8 @@ package it.linksmt.rental.controller;
 import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
 import it.linksmt.rental.entity.UserEntity;
-import it.linksmt.rental.exception.BusinessException;
+
+import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.JwtService;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AuthenticationController {
         try {
             UserEntity registeredUser = authenticationService.signUp(createUserRequest);
             return ResponseEntity.ok().body(registeredUser);
-        } catch (BusinessException e) {
+        } catch (ServiceException e) {
                 throw e;
         }
     }
@@ -42,7 +43,7 @@ public class AuthenticationController {
 //        loginResponse.setExpiresIn(jwtService.getExpirationTime());
            return ResponseEntity.ok(token);
        }
-       catch (BusinessException e) {
+       catch (ServiceException e) {
            throw e;
        }
     }

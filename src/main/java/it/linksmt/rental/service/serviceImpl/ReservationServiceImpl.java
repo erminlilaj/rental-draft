@@ -35,8 +35,8 @@ public class ReservationServiceImpl implements ReservationService {
     private VehicleRepository vehicleRepository;
     private UserRepository userRepository;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository, AuthenticationService authenticationService
-            , VehicleRepository vehicleRepository, UserRepository userRepository, VehicleServiceImpl vehicleServiceImpl, UserServiceImpl userServiceImpl) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, AuthenticationService authenticationService,
+                                  VehicleRepository vehicleRepository, UserRepository userRepository, VehicleServiceImpl vehicleServiceImpl, UserServiceImpl userServiceImpl) {
         this.reservationRepository = reservationRepository;
         this.authenticationService = authenticationService;
         this.vehicleRepository=vehicleRepository;
@@ -47,28 +47,41 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationResponse createReservation(CreateReservationRequest reservationRequest) {
-        Long currentUserId=authenticationService.getCurrentUserId();
-        VehicleEntity requestedVehicle=vehicleServiceImpl.findVehicleById(reservationRequest.getVehicleId());
+        Long currentUserId = authenticationService.getCurrentUserId();
+        VehicleEntity requestedVehicle = vehicleServiceImpl.getVehicleById(reservationRequest.getVehicleId());
 
-        boolean isVehicleBusy = reservationRepository.areDatesOverlapping(
-                reservationRequest.getVehicleId(),
-                reservationRequest.getStartDate(),
-                reservationRequest.getEndDate());
-
-        if (requestedVehicle.getVehicleStatus().equals(VehicleStatus.MAINTENANCE)|| isVehicleBusy) {
-            throw new ServiceException(
-                    ErrorCode.VEHICLE_NOT_AVAILABLE,
-                    "vehicle isnt available"
-            );
+        if (!checkAvailability(reservationRequest)) {
+            throw new ServiceException(ErrorCode.VEHICLE_NOT_AVAILABLE, "Vehicle is not available for the selected dates");
         }
-        System.out.println("reservation creeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeated"+ isVehicleBusy);
 
-        ReservationEntity savedReservation = saveReservationDetails(reservationRequest,requestedVehicle,currentUserId);
-
+        ReservationEntity savedReservation = saveReservationDetails(reservationRequest, requestedVehicle, currentUserId);
         return convertReservationToResponse(savedReservation);
     }
+    @Override
+    public boolean checkAvailability(CreateReservationRequest reservationRequest) {
+        VehicleEntity requestedVehicle = vehicleServiceImpl.getVehicleById(reservationRequest.getVehicleId());
 
+        // Detailed logging
+        System.out.println("Requested Vehicle ID: " + requestedVehicle.getId());
+        System.out.println("Vehicle Status: " + requestedVehicle.getVehicleStatus());
 
+        boolean isVehicleBusy = reservationRepository.areDatesOverlapping(
+                requestedVehicle.getId(),
+                reservationRequest.getStartDate(),
+                reservationRequest.getEndDate()
+        );
+
+        System.out.println("Is Vehicle Busy (Overlapping): " + isVehicleBusy);
+
+        boolean isAvailable = !requestedVehicle.getVehicleStatus().equals(VehicleStatus.MAINTENANCE) && !isVehicleBusy;
+
+        System.out.println("Detailed Availability Check:");
+        System.out.println("Vehicle Status Check: " + !requestedVehicle.getVehicleStatus().equals(VehicleStatus.MAINTENANCE));
+        System.out.println("Vehicle Busy Check: " + !isVehicleBusy);
+        System.out.println("Final Availability: " + isAvailable);
+
+        return isAvailable;
+    }
 
 
     public ReservationResponse convertReservationToResponse(ReservationEntity savedReservation) {

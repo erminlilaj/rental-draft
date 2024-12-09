@@ -27,6 +27,11 @@ public class ReservationController {
             ReservationResponse createdReservation = reservationService.createReservation(reservationRequest);
             return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(createdReservation);
     }
+    @PostMapping("/check-availability")
+    public ResponseEntity<Boolean> checkReservationAvailability(@RequestBody CreateReservationRequest reservationRequest) {
+        boolean isAvailable = reservationService.checkAvailability(reservationRequest);
+        return ResponseEntity.ok(isAvailable);
+    }
 
     @DeleteMapping("/cancel/{id}")
     public ResponseEntity<ReservationResponse> cancelReservation(@PathVariable Long id) {

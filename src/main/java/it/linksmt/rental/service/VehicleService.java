@@ -2,6 +2,7 @@ package it.linksmt.rental.service;
 
 import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
+import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface VehicleService {
 
     List<VehicleEntity> findAllVehicle();
 
-    VehicleEntity findVehicleById(Long id);
+    VehicleResponse findVehicleById(Long id);
 
     boolean deleteVehicle(Long id);
 

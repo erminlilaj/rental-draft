@@ -2,6 +2,7 @@ package it.linksmt.rental.service.serviceImpl;
 
 import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
+import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.ErrorCode;
 
@@ -14,7 +15,6 @@ import it.linksmt.rental.service.VehicleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -77,13 +77,31 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public VehicleEntity findVehicleById(Long id) {
+    public VehicleResponse findVehicleById(Long id) {
 
 
-            return vehicleRepository.findById(id).orElseThrow(()->new ServiceException(
+            VehicleEntity vehicleEntity= vehicleRepository.findById(id).orElseThrow(()->new ServiceException(
                     ErrorCode.VEHICLE_NOT_FOUND
             ));
-
+return convertVehicleToResponse(vehicleEntity);
+    }
+public VehicleEntity getVehicleById(Long id) {
+        return vehicleRepository.findById(id).orElseThrow(()->new ServiceException(
+                ErrorCode.VEHICLE_NOT_FOUND
+        ));
+}
+    private VehicleResponse convertVehicleToResponse(VehicleEntity vehicleEntity) {
+        VehicleResponse vehicleResponse = new VehicleResponse();
+        vehicleResponse.setId(vehicleEntity.getId());
+        vehicleResponse.setBrand(vehicleEntity.getBrand());
+        vehicleResponse.setModel(vehicleEntity.getModel());
+        vehicleResponse.setYear(vehicleEntity.getYear());
+        vehicleResponse.setGearboxType(vehicleEntity.getGearboxType());
+        vehicleResponse.setFuelType(vehicleEntity.getFuelType());
+        vehicleResponse.setColor(vehicleEntity.getColor());
+        vehicleResponse.setVehicleStatus(vehicleEntity.getVehicleStatus());
+        vehicleResponse.setDailyFee(vehicleEntity.getDailyFee());
+        return vehicleResponse;
     }
 
     @Override
@@ -140,7 +158,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public double getVehiclePrice(Long id) {
-        VehicleEntity vehicle = findVehicleById(id);
+        VehicleEntity vehicle = getVehicleById(id);
         return vehicle.getDailyFee();
     }
 

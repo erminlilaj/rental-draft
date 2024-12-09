@@ -2,6 +2,7 @@ package it.linksmt.rental.controller;
 
 import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
+import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.UserType;
 
@@ -13,6 +14,7 @@ import it.linksmt.rental.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/vehicles")
+//@CrossOrigin
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -53,15 +56,13 @@ public class VehicleController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<VehicleEntity> getVehicleById(@PathVariable Long id) {
-        try {
-            VehicleEntity vehicle = vehicleService.findVehicleById(id);
+    @GetMapping(produces =MediaType.APPLICATION_JSON_VALUE,path = {"/{id}"})
+    public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable Long id) {
+
+            VehicleResponse vehicle = vehicleService.findVehicleById(id);
 
             return ResponseEntity.status(HttpStatus.OK).body(vehicle);
-        }catch (ServiceException e) {
-            throw e;
-        }
+
 
     }
 

@@ -11,6 +11,9 @@ import it.linksmt.rental.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequestMapping("/auth")
 @RestController
 @CrossOrigin
@@ -35,11 +38,13 @@ public class AuthenticationController {
 
            UserEntity user = authenticationService.authenticate(loginUserRequest);
            String token = jwtService.generateToken(user);
-//        LoginResponse loginResponse=new LoginResponse();
-//        loginResponse.setToken(token);
-//        loginResponse.setExpiresIn(jwtService.getExpirationTime());
-           return ResponseEntity.ok(token);
 
+           return ResponseEntity.ok(token);
+    }
+    @GetMapping("/userId")
+    public ResponseEntity<Long>getLoggedUserId(){
+        Long userId=authenticationService.getCurrentUserId();
+        return ResponseEntity.ok(userId);
     }
 
 }

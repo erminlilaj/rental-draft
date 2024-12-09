@@ -2,10 +2,12 @@ package it.linksmt.rental.service;
 
 import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
+import it.linksmt.rental.dto.RegisterUserRequest;
 import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.enums.ErrorCode;
 
 
+import it.linksmt.rental.enums.UserType;
 import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.repository.UserRepository;
 import it.linksmt.rental.security.SecurityBean;
@@ -29,32 +31,32 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public UserEntity signUp(CreateUserRequest createUserRequest) {
-        if (userRepository.existsByUsername(createUserRequest.getUsername())) {
+    public UserEntity signUp(RegisterUserRequest registerUserRequest) {
+        if (userRepository.existsByUsername(registerUserRequest.getUsername())) {
             throw new ServiceException(
                     ErrorCode.USER_ALREADY_EXISTS,
-                    "User already exists with username: " + createUserRequest.getUsername()
+                    "User already exists with username: " + registerUserRequest.getUsername()
             );
         }
 
-        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+        if (userRepository.existsByEmail(registerUserRequest.getEmail())) {
             throw new ServiceException(
                     ErrorCode.USER_ALREADY_EXISTS,
-                    "User already exists with email: " + createUserRequest.getEmail()
+                    "User already exists with email: " + registerUserRequest.getEmail()
             );
         }
 
         try {
             UserEntity user = new UserEntity();
-            user.setUsername(createUserRequest.getUsername());
-            user.setName(createUserRequest.getName());
-            user.setSurname(createUserRequest.getSurname());
-            user.setEmail(createUserRequest.getEmail());
+            user.setUsername(registerUserRequest.getUsername());
+            user.setName(registerUserRequest.getName());
+            user.setSurname(registerUserRequest.getSurname());
+            user.setEmail(registerUserRequest.getEmail());
             String salt = "salt";
-            String password = createUserRequest.getPassword() + salt;
+            String password = registerUserRequest.getPassword() + salt;
             user.setPassword(passwordEncoder.encode(password));
-            user.setAge(createUserRequest.getAge());
-            user.setUserType(createUserRequest.getUserType());
+            user.setAge(registerUserRequest.getAge());
+            user.setUserType(UserType.USER);
 
             return userRepository.save(user);
         } catch (Exception e) {

@@ -16,4 +16,6 @@ public interface ReservationService {
     boolean checkAvailability(CreateReservationRequest reservationRequest);
 
     List<ReservationStatisticsResponse> getReservationStatistics(String date);
+
+    List<ReservationResponse> getReservationListOfUser();
 }

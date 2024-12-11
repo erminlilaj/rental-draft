@@ -243,5 +243,16 @@ return reservationList.stream()
         return List.of(completedResponse, ongoingResponse, cancelledResponse);
     }
 
+    @Override
+    public List<ReservationResponse> getReservationListOfUser() {
+       Long userId=authenticationService.getCurrentUserId();
+List<ReservationEntity> reservationEntityList=reservationRepository.findUsersReservations(userId);
+List<ReservationResponse> reservationResponseList=convertReservationListToResponse(reservationEntityList);
+        if(reservationResponseList.isEmpty()) {
+            return List.of();
+        }
+        return reservationResponseList;
+    }
+
 
 }

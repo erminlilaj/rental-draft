@@ -55,6 +55,10 @@ public class ReservationController {
         List<ReservationStatisticsResponse> statisticsResponses = reservationService.getReservationStatistics(date);
         return ResponseEntity.ok(statisticsResponses);
     }
-
+  @GetMapping("/reservation-list")
+    public ResponseEntity<List<ReservationResponse>> getReservationListOfUser() {
+        List<ReservationResponse> reservationResponseList=reservationService.getReservationListOfUser();
+        return ResponseEntity.status(HttpStatus.OK).body(reservationResponseList);
+  }
 
 }

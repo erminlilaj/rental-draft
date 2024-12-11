@@ -29,9 +29,9 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public VehicleEntity createVehicle(CreateVehicleRequest createVehicleRequest) {
-        SecurityBean currentUser = SecurityContext.get();
+        //SecurityBean currentUser = SecurityContext.get();
 
-        if (!authenticationService.isAdmin(currentUser)) {
+        if (!authenticationService.isAdmin()) {
             //throw new AccessDeniedException(
             throw new ServiceException(
                     ErrorCode.UNAUTHORIZED_ACCESS,
@@ -106,9 +106,9 @@ public VehicleEntity getVehicleById(Long id) {
 
     @Override
     public boolean deleteVehicle(Long id) {
-        SecurityBean currentUser = SecurityContext.get();
+       // SecurityBean currentUser = SecurityContext.get();
 
-        if (!authenticationService.isAdmin(currentUser)) {
+        if (!authenticationService.isAdmin()) {
             throw new ServiceException(
                     ErrorCode.UNAUTHORIZED_ACCESS,
                     "You do not have access to delete a vehicle"
@@ -134,10 +134,10 @@ public VehicleEntity getVehicleById(Long id) {
 
     @Override
     public VehicleEntity updateVehicle(Long id, UpdateVehicleRequest updateVehicleRequest) {
-        SecurityBean currentUser = SecurityContext.get();
+        //SecurityBean currentUser = SecurityContext.get();
 
 
-        if (!authenticationService.isAdmin(currentUser)) {
+        if (!authenticationService.isAdmin()) {
             throw new ServiceException(
                     ErrorCode.UNAUTHORIZED_ACCESS,
                     "You do not have access to update a vehicle."

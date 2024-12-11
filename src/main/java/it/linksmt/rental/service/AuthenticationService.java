@@ -1,6 +1,5 @@
 package it.linksmt.rental.service;
 
-import it.linksmt.rental.dto.CreateUserRequest;
 import it.linksmt.rental.dto.LoginUserRequest;
 import it.linksmt.rental.dto.RegisterUserRequest;
 import it.linksmt.rental.entity.UserEntity;
@@ -11,6 +10,7 @@ import it.linksmt.rental.enums.UserType;
 import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.repository.UserRepository;
 import it.linksmt.rental.security.SecurityBean;
+import it.linksmt.rental.security.SecurityContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -97,7 +97,8 @@ public class AuthenticationService {
         }
     }
 
-    public boolean isAdmin(SecurityBean currentUser) {
+    public boolean isAdmin() {
+        SecurityBean currentUser = SecurityContext.get();
         return currentUser.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
@@ -108,5 +109,6 @@ public class AuthenticationService {
                         "User not loogged in"))
                 .getId();
     }
+
 
 }

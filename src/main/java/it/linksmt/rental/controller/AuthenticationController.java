@@ -46,5 +46,10 @@ public class AuthenticationController {
         Long userId=authenticationService.getCurrentUserId();
         return ResponseEntity.ok(userId);
     }
+    @GetMapping("/isAdmin")
+    public ResponseEntity<Boolean> isAdmin(){
+        boolean isAdmin=authenticationService.isAdmin();
+        return ResponseEntity.ok(isAdmin);
+    }
 
 }

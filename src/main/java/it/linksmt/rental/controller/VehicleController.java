@@ -4,25 +4,25 @@ import it.linksmt.rental.dto.CreateVehicleRequest;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
-import it.linksmt.rental.enums.UserType;
 
 import it.linksmt.rental.exception.ServiceException;
-import it.linksmt.rental.security.SecurityBean;
-import it.linksmt.rental.security.SecurityContext;
-import it.linksmt.rental.service.AuthenticationService;
+import it.linksmt.rental.service.FileStorageService;
 import it.linksmt.rental.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,13 +31,17 @@ import java.util.Optional;
 public class VehicleController {
 
     private final VehicleService vehicleService;
-
+    private final FileStorageService fileStorageService;
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping
-    public ResponseEntity<?> createVehicle(@RequestBody CreateVehicleRequest createVehicleRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createVehicle(
+            @RequestPart("vehicleData") CreateVehicleRequest createVehicleRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
      try {
-         VehicleEntity createdVehicle = vehicleService.createVehicle(createVehicleRequest);
+         VehicleEntity createdVehicle = vehicleService.createVehicle(createVehicleRequest, image);
+
          return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
      } catch (ServiceException e) {
         throw e;
@@ -85,6 +89,12 @@ public class VehicleController {
             return ResponseEntity.status(HttpStatus.OK).body(vehicle);
 
 }
-
-
+    @GetMapping("/image/{vehicleId}")
+    public ResponseEntity<Resource> getVehicleImage(String imagePath) throws IOException {
+      Resource image=vehicleService.getVehicleImage(imagePath);
+      return ResponseEntity.status(HttpStatus.OK).body(image);
+    }
 }
+
+
+

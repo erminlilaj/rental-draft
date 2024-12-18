@@ -49,5 +49,10 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity,L
     @Query("SELECT r FROM ReservationEntity r WHERE r.user.id = :userId")
     List<ReservationEntity> findUsersReservations(Long userId);
 
-
+    @Query("SELECT r FROM ReservationEntity r " +
+            "WHERE r.vehicle.id = :vehicleId " +
+            "AND r.status = 'RESERVED' " +
+            "AND (r.startDate <= :currentTime AND r.endDate >= :currentTime " +
+            "OR r.startDate > :currentTime)")
+    List<ReservationEntity> listOfActiveOrFutureReservations(Long vehicleId, LocalDateTime currentTime);
 }

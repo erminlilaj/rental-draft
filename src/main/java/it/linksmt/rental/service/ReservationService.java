@@ -18,4 +18,7 @@ public interface ReservationService {
     List<ReservationStatisticsResponse> getReservationStatistics(String date);
 
     List<ReservationResponse> getReservationListOfUser();
+
+   List<ReservationResponse> listOfActiveOrFutureReservations(Long id);
+   List<ReservationResponse> cancelReservationsOfVehicle(Long vehicleId);
 }

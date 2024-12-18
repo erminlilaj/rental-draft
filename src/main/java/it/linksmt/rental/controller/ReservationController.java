@@ -3,8 +3,6 @@ package it.linksmt.rental.controller;
 import it.linksmt.rental.dto.CreateReservationRequest;
 import it.linksmt.rental.dto.ReservationResponse;
 import it.linksmt.rental.dto.ReservationStatisticsResponse;
-import it.linksmt.rental.entity.ReservationEntity;
-import it.linksmt.rental.entity.UserEntity;
 import it.linksmt.rental.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +30,11 @@ public class ReservationController {
     public ResponseEntity<Boolean> checkReservationAvailability(@RequestBody CreateReservationRequest reservationRequest) {
         boolean isAvailable = reservationService.checkAvailability(reservationRequest);
         return ResponseEntity.ok(isAvailable);
+    }
+    @GetMapping(value="/vehicle-reservations/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ReservationResponse>>listOfActiveOrFutureReservations(@PathVariable("id") Long id) {
+        List<ReservationResponse>vehiclesReservations= reservationService.listOfActiveOrFutureReservations(id);
+        return ResponseEntity.ok(vehiclesReservations);
     }
 
     @DeleteMapping(value = "/cancel/{id}",produces = MediaType.APPLICATION_JSON_VALUE)

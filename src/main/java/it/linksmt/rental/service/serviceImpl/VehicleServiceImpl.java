@@ -1,6 +1,7 @@
 package it.linksmt.rental.service.serviceImpl;
 
 import it.linksmt.rental.dto.CreateVehicleRequest;
+import it.linksmt.rental.dto.ReservationResponse;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
@@ -8,17 +9,16 @@ import it.linksmt.rental.enums.ErrorCode;
 
 import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.repository.VehicleRepository;
-import it.linksmt.rental.security.SecurityBean;
-import it.linksmt.rental.security.SecurityContext;
 import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.FileStorageService;
+import it.linksmt.rental.service.VehicleBusinessLayer;
 import it.linksmt.rental.service.VehicleService;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,10 +28,13 @@ public class VehicleServiceImpl implements VehicleService {
     public AuthenticationService authenticationService;
     public FileStorageService fileStorageService;
 
+
     public VehicleServiceImpl(VehicleRepository vehicleRepository, AuthenticationService authenticationService, FileStorageService fileStorageService) {
         this.vehicleRepository = vehicleRepository;
         this.authenticationService = authenticationService;
         this.fileStorageService = fileStorageService;
+        //this.vehicleBusinessLayer = vehicleBusinessLayer;
+
     }
 
     @Override
@@ -133,7 +136,14 @@ public VehicleEntity getVehicleById(Long id) {
            );
        }
        try{
-           vehicleRepository.deleteById(id);
+           //perform soft delete
+        VehicleEntity deletedVehicle=vehicleRepository.findById(id).orElse(null);
+        deletedVehicle.setDeletedAt(LocalDateTime.now());
+//if(vehicleBusinessLayer.activateOrFutureReservationOfVehicle(id)!=null){
+//    vehicleBusinessLayer.deleteVehicle(id);
+//}
+
+        vehicleRepository.save(deletedVehicle);
           return true;
        }catch (Exception e) {
            throw new ServiceException(

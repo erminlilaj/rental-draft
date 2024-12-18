@@ -6,7 +6,9 @@ import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
 
 import it.linksmt.rental.exception.ServiceException;
+import it.linksmt.rental.repository.VehicleRepository;
 import it.linksmt.rental.service.FileStorageService;
+import it.linksmt.rental.service.VehicleBusinessLayer;
 import it.linksmt.rental.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
     private final FileStorageService fileStorageService;
+    private final VehicleBusinessLayer vehicleBusinessLayer;
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -73,7 +76,7 @@ public class VehicleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
         try{
-     vehicleService.deleteVehicle(id);
+     vehicleBusinessLayer.deleteVehicle(id);
             return ResponseEntity.status(HttpStatus.OK).build();
         }catch (ServiceException e) {
             throw e;

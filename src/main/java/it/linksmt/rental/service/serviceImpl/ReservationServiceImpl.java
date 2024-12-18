@@ -17,10 +17,7 @@ import it.linksmt.rental.service.AuthenticationService;
 import it.linksmt.rental.service.ReservationService;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,20 +129,20 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponse> findAllReservations() {
-       List<ReservationEntity> reservationsList=reservationRepository.findAll();
-       if(reservationsList==null){
-           throw new ServiceException(
-                   ErrorCode.RESERVATION_NOT_FOUND,
-                   "There is no reservations"
-           );
-       }
+        List<ReservationEntity> reservationsList=reservationRepository.findAll();
+        if(reservationsList==null){
+            throw new ServiceException(
+                    ErrorCode.RESERVATION_NOT_FOUND,
+                    "There is no reservations"
+            );
+        }
         return convertReservationListToResponse(reservationsList);
     }
-public List<ReservationResponse> convertReservationListToResponse(List<ReservationEntity> reservationList) {
-return reservationList.stream()
-        .map(reservationEntity -> convertReservationToResponse(reservationEntity))
-        .collect(Collectors.toUnmodifiableList());
-}
+    public List<ReservationResponse> convertReservationListToResponse(List<ReservationEntity> reservationList) {
+        return reservationList.stream()
+                .map(reservationEntity -> convertReservationToResponse(reservationEntity))
+                .collect(Collectors.toUnmodifiableList());
+    }
 
 
     @Override
@@ -175,6 +172,30 @@ return reservationList.stream()
         ReservationEntity savedReservation = reservationRepository.save(reservationEntity);
 
         return convertReservationToResponse(savedReservation);
+    }
+
+    @Override
+    public List<ReservationResponse> cancelReservationsOfVehicle(Long vehicleId) {
+
+        List<ReservationEntity> vehiclesReservations = reservationRepository.listOfActiveOrFutureReservations(vehicleId, LocalDateTime.now());
+
+
+        List<ReservationResponse> cancelledReservations = new ArrayList<>();
+        for (ReservationEntity reservation : vehiclesReservations) {
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            ReservationEntity savedReservation = reservationRepository.save(reservation);
+            cancelledReservations.add(convertReservationToResponse(savedReservation));
+        }
+
+        return cancelledReservations;
+    }
+    @Override
+    public List<ReservationResponse> listOfActiveOrFutureReservations(Long vehicleId) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        List<ReservationEntity> vehiclesReservations = reservationRepository.listOfActiveOrFutureReservations(vehicleId, currentTime);
+        List<ReservationResponse> reservationResponseList = convertReservationListToResponse(vehiclesReservations);
+
+        return reservationResponseList;
     }
 
 
@@ -245,9 +266,9 @@ return reservationList.stream()
 
     @Override
     public List<ReservationResponse> getReservationListOfUser() {
-       Long userId=authenticationService.getCurrentUserId();
-List<ReservationEntity> reservationEntityList=reservationRepository.findUsersReservations(userId);
-List<ReservationResponse> reservationResponseList=convertReservationListToResponse(reservationEntityList);
+        Long userId=authenticationService.getCurrentUserId();
+        List<ReservationEntity> reservationEntityList=reservationRepository.findUsersReservations(userId);
+        List<ReservationResponse> reservationResponseList=convertReservationListToResponse(reservationEntityList);
         if(reservationResponseList.isEmpty()) {
             return List.of();
         }

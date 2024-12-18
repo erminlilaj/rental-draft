@@ -82,7 +82,8 @@ public class VehicleServiceImpl implements VehicleService {
             );
         }
         try {
-            return vehicleRepository.findAll();
+
+            return vehicleRepository.findCurrentVehicles();
         }catch (Exception e) {
             throw new ServiceException(
                     ErrorCode.INTERNAL_SERVER_ERROR,

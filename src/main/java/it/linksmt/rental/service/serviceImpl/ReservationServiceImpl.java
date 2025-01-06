@@ -14,6 +14,7 @@ import it.linksmt.rental.repository.UserRepository;
 import it.linksmt.rental.repository.VehicleRepository;
 import it.linksmt.rental.repository.projections.ReservationStatisticsProjection;
 import it.linksmt.rental.service.AuthenticationService;
+import it.linksmt.rental.service.InvoiceService;
 import it.linksmt.rental.service.ReservationService;
 import org.springframework.stereotype.Service;
 
@@ -29,17 +30,19 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserServiceImpl userServiceImpl;
     private ReservationRepository reservationRepository;
     private AuthenticationService authenticationService;
+    private InvoiceService invoiceService;
     private VehicleRepository vehicleRepository;
     private UserRepository userRepository;
 
     public ReservationServiceImpl(ReservationRepository reservationRepository, AuthenticationService authenticationService,
-                                  VehicleRepository vehicleRepository, UserRepository userRepository, VehicleServiceImpl vehicleServiceImpl, UserServiceImpl userServiceImpl) {
+                                  VehicleRepository vehicleRepository, UserRepository userRepository, VehicleServiceImpl vehicleServiceImpl, UserServiceImpl userServiceImpl, InvoiceService invoiceService) {
         this.reservationRepository = reservationRepository;
         this.authenticationService = authenticationService;
         this.vehicleRepository=vehicleRepository;
         this.userRepository=userRepository;
         this.vehicleServiceImpl = vehicleServiceImpl;
         this.userServiceImpl = userServiceImpl;
+        this.invoiceService = invoiceService;
     }
 
     @Override
@@ -111,7 +114,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservationEntity.setTotalPrice(totalPrice);
         reservationEntity.setDurationDays(durationDays);
 
-        return reservationRepository.save(reservationEntity);
+        ReservationEntity savedReservation = reservationRepository.save(reservationEntity);
+        invoiceService.generateInvoice(reservationEntity.getId());
+        return savedReservation;
+
     }
 
     @Override

@@ -101,6 +101,7 @@ public class VehicleServiceImpl implements VehicleService {
             ));
 return convertVehicleToResponse(vehicleEntity);
     }
+
 public VehicleEntity getVehicleById(Long id) {
         return vehicleRepository.findById(id).orElseThrow(()->new ServiceException(
                 ErrorCode.VEHICLE_NOT_FOUND
@@ -117,6 +118,7 @@ public VehicleEntity getVehicleById(Long id) {
         vehicleResponse.setColor(vehicleEntity.getColor());
         vehicleResponse.setVehicleStatus(vehicleEntity.getVehicleStatus());
         vehicleResponse.setDailyFee(vehicleEntity.getDailyFee());
+        vehicleResponse.setImagePath(vehicleEntity.getImagePath());
         return vehicleResponse;
     }
 

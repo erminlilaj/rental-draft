@@ -20,4 +20,5 @@ public class VehicleResponse {
     private String color;
     private VehicleStatus vehicleStatus;
     private double dailyFee;
+    private String imagePath;
 }

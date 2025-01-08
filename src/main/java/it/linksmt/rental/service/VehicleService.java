@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 public interface VehicleService {
@@ -24,4 +25,6 @@ public interface VehicleService {
     double getVehiclePrice(Long id);
 
     Resource getVehicleImage(String imagePath)throws IOException;;
+
+    HashMap countVehicleStatuses();
 }

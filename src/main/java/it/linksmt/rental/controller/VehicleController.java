@@ -24,6 +24,7 @@ import org.springframework.core.io.UrlResource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -96,6 +97,12 @@ public class VehicleController {
     public ResponseEntity<Resource> getVehicleImage(String imagePath) throws IOException {
       Resource image=vehicleService.getVehicleImage(imagePath);
       return ResponseEntity.status(HttpStatus.OK).body(image);
+    }
+
+    @GetMapping(produces =MediaType.APPLICATION_JSON_VALUE,path = {"/statuses"})
+    public ResponseEntity<HashMap> countVehicleStatuses() {
+        HashMap statuses =vehicleService.countVehicleStatuses();
+        return ResponseEntity.status(HttpStatus.OK).body(statuses);
     }
 }
 

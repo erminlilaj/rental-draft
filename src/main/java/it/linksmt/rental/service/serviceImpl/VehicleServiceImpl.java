@@ -7,6 +7,7 @@ import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.ErrorCode;
 
+import it.linksmt.rental.enums.VehicleStatus;
 import it.linksmt.rental.exception.ServiceException;
 import it.linksmt.rental.repository.VehicleRepository;
 import it.linksmt.rental.service.AuthenticationService;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -193,6 +195,25 @@ public VehicleEntity getVehicleById(Long id) {
            return null;
        }
        return fileStorageService.getImage(imagePath);
+    }
+
+    @Override
+    public HashMap countVehicleStatuses() {
+        List<VehicleEntity> vehicles = vehicleRepository.findCurrentVehicles();
+        int available=0;
+        int maintenance=0;
+        for(VehicleEntity vehicle:vehicles) {
+            if(vehicle.getVehicleStatus()== VehicleStatus.AVAILABLE) {
+                available++;
+            }
+            else if(vehicle.getVehicleStatus()==VehicleStatus.MAINTENANCE) {
+                maintenance++;
+            }
+        }
+HashMap<String,Integer> statuses=new HashMap<>();
+        statuses.put("available",available);
+        statuses.put("maintenance",maintenance);
+        return statuses;
     }
 
 }

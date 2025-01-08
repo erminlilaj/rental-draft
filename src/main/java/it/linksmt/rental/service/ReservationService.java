@@ -4,6 +4,7 @@ import it.linksmt.rental.dto.CreateReservationRequest;
 import it.linksmt.rental.dto.ReservationResponse;
 import it.linksmt.rental.dto.ReservationStatisticsResponse;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface ReservationService {
@@ -21,4 +22,8 @@ public interface ReservationService {
 
    List<ReservationResponse> listOfActiveOrFutureReservations(Long id);
    List<ReservationResponse> cancelReservationsOfVehicle(Long vehicleId);
+
+    HashMap countReservationsStatuses();
+
+    HashMap sumReservationsProfits();
 }

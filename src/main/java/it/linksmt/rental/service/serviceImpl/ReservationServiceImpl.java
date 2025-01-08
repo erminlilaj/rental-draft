@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -195,6 +196,51 @@ public class ReservationServiceImpl implements ReservationService {
 
         return cancelledReservations;
     }
+
+    @Override
+    public HashMap countReservationsStatuses() {
+        LocalDateTime now = LocalDateTime.now();
+        List<ReservationEntity> completedReservations = reservationRepository.completedReservations(now);
+        List<ReservationEntity> ongoingReservations = reservationRepository.ongoingReservations(now);
+        List<ReservationEntity> cancelledReservations= reservationRepository.cancelledReservations();
+        List<ReservationEntity> futureReservations= reservationRepository.futureReservations(now);
+        int completed=completedReservations.size();
+        int ongoing=ongoingReservations.size();
+        int cancelled=cancelledReservations.size();
+        int future=futureReservations.size();
+        HashMap<String,Integer> statuses=new HashMap<>();
+        statuses.put("completed",completed);
+        statuses.put("ongoing",ongoing);
+        statuses.put("cancelled",cancelled);
+        statuses.put("future",future);
+
+        return statuses;
+    }
+
+    @Override
+    public HashMap sumReservationsProfits() {
+        List<ReservationEntity> completedReservations = reservationRepository.completedReservations(LocalDateTime.now());
+        List<ReservationEntity> ongoingReservations = reservationRepository.ongoingReservations(LocalDateTime.now());
+        List<ReservationEntity> futureReservations = reservationRepository.futureReservations(LocalDateTime.now());
+        double profitMade=0;
+        double plannedProfit=0;
+
+        for (ReservationEntity reservation : completedReservations) {
+            profitMade=profitMade+reservation.getTotalPrice();
+        }
+        for (ReservationEntity reservation : ongoingReservations) {
+            plannedProfit=plannedProfit+reservation.getTotalPrice();
+        }
+        for (ReservationEntity reservation : futureReservations) {
+            plannedProfit=plannedProfit+reservation.getTotalPrice();
+        }
+
+        HashMap<String,Double> profits=new HashMap<>();
+        profits.put("profit made",profitMade);
+        profits.put("planned profit",plannedProfit);
+        return profits;
+    }
+
     @Override
     public List<ReservationResponse> listOfActiveOrFutureReservations(Long vehicleId) {
         LocalDateTime currentTime = LocalDateTime.now();

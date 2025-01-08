@@ -1,13 +1,10 @@
 package it.linksmt.rental.repository;
 
 import it.linksmt.rental.entity.ReservationEntity;
-import it.linksmt.rental.entity.UserEntity;
-import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.repository.projections.ReservationStatisticsProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -55,4 +52,24 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity,L
             "AND (r.startDate <= :currentTime AND r.endDate >= :currentTime " +
             "OR r.startDate > :currentTime)")
     List<ReservationEntity> listOfActiveOrFutureReservations(Long vehicleId, LocalDateTime currentTime);
+
+    @Query("SELECT r FROM ReservationEntity r "+
+    "WHERE r.status='RESERVED'"+
+    "AND r.endDate <= :currentTime")
+    List<ReservationEntity> completedReservations(LocalDateTime currentTime);
+
+@Query("SELECT r FROM ReservationEntity r "+
+"WHERE r.status='RESERVED' "+
+"AND r.startDate <= :currentTime AND r.endDate >= :currentTime")
+    List<ReservationEntity> ongoingReservations(LocalDateTime currentTime);
+
+@Query("SELECT r FROM ReservationEntity r "+
+"WHERE r.status='CANCELLED'")
+List<ReservationEntity> cancelledReservations();
+
+@Query("SELECT r FROM ReservationEntity r "+
+"WHERE r.status='RESERVED'"+
+"AND r.startDate> :currentTime ")
+List<ReservationEntity> futureReservations(LocalDateTime currentTime);
+
 }

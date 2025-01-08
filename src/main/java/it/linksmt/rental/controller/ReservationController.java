@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -64,5 +65,17 @@ public class ReservationController {
         List<ReservationResponse> reservationResponseList=reservationService.getReservationListOfUser();
         return ResponseEntity.status(HttpStatus.OK).body(reservationResponseList);
   }
+    @GetMapping(produces =MediaType.APPLICATION_JSON_VALUE,path = {"/statuses"})
+    public ResponseEntity<HashMap> countReservationsStatuses() {
+        HashMap statuses =reservationService.countReservationsStatuses();
+        return ResponseEntity.status(HttpStatus.OK).body(statuses);
+    }
+
+    @GetMapping(produces =MediaType.APPLICATION_JSON_VALUE,path = {"/profits"})
+    public ResponseEntity<HashMap> sumReservationsProfits() {
+        HashMap statuses =reservationService.sumReservationsProfits();
+        return ResponseEntity.status(HttpStatus.OK).body(statuses);
+    }
+
 
 }

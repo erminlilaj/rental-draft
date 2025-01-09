@@ -12,4 +12,8 @@ public interface VehicleRepository extends JpaRepository<VehicleEntity, Long> {
     @Query("SELECT v FROM VehicleEntity v WHERE v.deletedAt IS NULL")
     List<VehicleEntity> findCurrentVehicles();
 
+@Query("SELECT v FROM VehicleEntity v WHERE v.deletedAt IS NULL "+
+"AND v.vehicleStatus='AVAILABLE'")
+    List<VehicleEntity> findAvailableVehicles();
+
 }

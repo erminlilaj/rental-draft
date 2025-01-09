@@ -1,6 +1,8 @@
 package it.linksmt.rental.service.serviceImpl;
 
+import it.linksmt.rental.dto.GetAvailableVehiclesRequest;
 import it.linksmt.rental.dto.ReservationResponse;
+import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.service.ReservationService;
 import it.linksmt.rental.service.VehicleBusinessLayer;
 import it.linksmt.rental.service.VehicleService;
@@ -28,5 +30,13 @@ private final VehicleService vehicleService;
     @Override
     public List<ReservationResponse> activateOrFutureReservationOfVehicle(Long id) {
         return reservationService.listOfActiveOrFutureReservations(id);
+    }
+
+    @Override
+    public List<VehicleResponse> getAvailableVehiclesByDateRange(GetAvailableVehiclesRequest getAvailableVehiclesRequest) {
+        List<VehicleResponse> availableVehicles= vehicleService.getAvailableVehicles();
+        List<Long> availableVehiclesIDsByDateRange = reservationService.getAvailableVehiclesByDateRange(availableVehicles,getAvailableVehiclesRequest);
+        List<VehicleResponse> availableVehiclesByDateRange=vehicleService.findVehiclesByIDs(availableVehiclesIDsByDateRange);
+        return availableVehiclesByDateRange;
     }
 }

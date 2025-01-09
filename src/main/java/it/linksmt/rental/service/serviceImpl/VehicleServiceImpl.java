@@ -1,7 +1,6 @@
 package it.linksmt.rental.service.serviceImpl;
 
 import it.linksmt.rental.dto.CreateVehicleRequest;
-import it.linksmt.rental.dto.ReservationResponse;
 import it.linksmt.rental.dto.UpdateVehicleRequest;
 import it.linksmt.rental.dto.VehicleResponse;
 import it.linksmt.rental.entity.VehicleEntity;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -214,6 +214,26 @@ HashMap<String,Integer> statuses=new HashMap<>();
         statuses.put("available",available);
         statuses.put("maintenance",maintenance);
         return statuses;
+    }
+
+    @Override
+    public List<VehicleResponse> getAvailableVehicles() {
+        List<VehicleEntity> availableVehicles=vehicleRepository.findCurrentVehicles();
+
+        return convertVehicleListToResponse(availableVehicles);
+    }
+
+    @Override
+    public List<VehicleResponse> findVehiclesByIDs(List<Long> availableVehiclesIDsByDateRange) {
+        List<VehicleEntity> vehicles=vehicleRepository.findAllById(availableVehiclesIDsByDateRange);
+
+        return convertVehicleListToResponse(vehicles);
+    }
+
+    public List<VehicleResponse> convertVehicleListToResponse(List<VehicleEntity> vehicleList) {
+        return vehicleList.stream()
+                .map(vehicleEntity  -> convertVehicleToResponse(vehicleEntity))
+                .collect(Collectors.toUnmodifiableList());
     }
 
 }

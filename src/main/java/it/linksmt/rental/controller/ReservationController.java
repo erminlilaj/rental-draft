@@ -1,11 +1,12 @@
 package it.linksmt.rental.controller;
 
-import it.linksmt.rental.dto.CreateReservationRequest;
-import it.linksmt.rental.dto.ReservationResponse;
-import it.linksmt.rental.dto.ReservationStatisticsResponse;
+import it.linksmt.rental.dto.*;
 import it.linksmt.rental.service.ReservationService;
+import it.linksmt.rental.service.VehicleBusinessLayer;
+import it.linksmt.rental.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -21,6 +22,9 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final VehicleBusinessLayer vehicleBusinessLayer;
+
+
 
     @PostMapping(value = "/create",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody CreateReservationRequest reservationRequest) {
@@ -75,6 +79,12 @@ public class ReservationController {
     public ResponseEntity<HashMap> sumReservationsProfits() {
         HashMap statuses =reservationService.sumReservationsProfits();
         return ResponseEntity.status(HttpStatus.OK).body(statuses);
+    }
+
+    @PostMapping("/search-daterange")
+public ResponseEntity<List<VehicleResponse>> getAvailableVehiclesByDate(@RequestBody GetAvailableVehiclesRequest getAvailableVehiclesRequest) {
+        List<VehicleResponse> availableVehicles= vehicleBusinessLayer.getAvailableVehiclesByDateRange(getAvailableVehiclesRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(availableVehicles);
     }
 
 

@@ -1,8 +1,6 @@
 package it.linksmt.rental.service;
 
-import it.linksmt.rental.dto.CreateReservationRequest;
-import it.linksmt.rental.dto.ReservationResponse;
-import it.linksmt.rental.dto.ReservationStatisticsResponse;
+import it.linksmt.rental.dto.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,4 +24,6 @@ public interface ReservationService {
     HashMap countReservationsStatuses();
 
     HashMap sumReservationsProfits();
+
+    List<Long> getAvailableVehiclesByDateRange(List<VehicleResponse> availableVehicles, GetAvailableVehiclesRequest getAvailableVehiclesRequest);
 }

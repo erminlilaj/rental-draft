@@ -43,7 +43,8 @@ public class SecurityConfigurations {
                                 "/configuration/security",
                                 "/swagger-ui/**",
                                 "/webjars/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/reservations/search-daterange"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")

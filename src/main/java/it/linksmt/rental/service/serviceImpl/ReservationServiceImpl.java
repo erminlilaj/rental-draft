@@ -1,8 +1,6 @@
 package it.linksmt.rental.service.serviceImpl;
 
-import it.linksmt.rental.dto.CreateReservationRequest;
-import it.linksmt.rental.dto.ReservationResponse;
-import it.linksmt.rental.dto.ReservationStatisticsResponse;
+import it.linksmt.rental.dto.*;
 import it.linksmt.rental.entity.ReservationEntity;
 import it.linksmt.rental.entity.VehicleEntity;
 import it.linksmt.rental.enums.ErrorCode;
@@ -239,6 +237,15 @@ public class ReservationServiceImpl implements ReservationService {
         profits.put("profit made",profitMade);
         profits.put("planned profit",plannedProfit);
         return profits;
+    }
+
+    @Override
+    public List<Long> getAvailableVehiclesByDateRange(List<VehicleResponse> availableVehicles, GetAvailableVehiclesRequest getAvailableVehiclesRequest) {
+        LocalDateTime start = getAvailableVehiclesRequest.getStartDate();
+        LocalDateTime end = getAvailableVehiclesRequest.getEndDate();
+        List<Long> IDs= availableVehicles.stream().map(VehicleResponse::getId).collect(Collectors.toList());
+List<Long> availableVehiclesIDs = reservationRepository.findAvailableVehicleByRange(IDs,start,end);
+        return availableVehiclesIDs;
     }
 
     @Override

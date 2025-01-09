@@ -27,4 +27,8 @@ public interface VehicleService {
     Resource getVehicleImage(String imagePath)throws IOException;;
 
     HashMap countVehicleStatuses();
+
+    List<VehicleResponse> getAvailableVehicles();
+
+    List<VehicleResponse> findVehiclesByIDs(List<Long> availableVehiclesIDsByDateRange);
 }

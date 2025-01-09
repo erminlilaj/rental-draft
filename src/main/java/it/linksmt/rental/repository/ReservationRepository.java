@@ -72,4 +72,16 @@ List<ReservationEntity> cancelledReservations();
 "AND r.startDate> :currentTime ")
 List<ReservationEntity> futureReservations(LocalDateTime currentTime);
 
+    @Query("SELECT v.id FROM VehicleEntity v " +
+            "WHERE v.id IN :vehicleIds " +
+            "AND v.id NOT IN (" +
+            "    SELECT DISTINCT r.vehicle.id FROM ReservationEntity r " +
+            "    WHERE r.status = 'RESERVED' " +
+            "    AND (" +
+            "        (r.startDate BETWEEN :startDate AND :endDate) " +
+            "        OR (r.endDate BETWEEN :startDate AND :endDate) " +
+            "        OR (:startDate BETWEEN r.startDate AND r.endDate)" +
+            "    )" +
+            ")")
+    List<Long> findAvailableVehicleByRange(List<Long> vehicleIds, LocalDateTime startDate, LocalDateTime endDate);
 }

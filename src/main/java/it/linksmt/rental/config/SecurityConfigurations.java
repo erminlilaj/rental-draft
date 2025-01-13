@@ -2,6 +2,7 @@ package it.linksmt.rental.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,8 +45,11 @@ public class SecurityConfigurations {
                                 "/swagger-ui/**",
                                 "/webjars/**",
                                 "/swagger-ui.html",
-                                "/api/reservations/search-daterange"
+                                "/api/reservations/search-daterange",
+                                "/api/reservations/check-availability",
+                                "/api/vehicles/image/{vehicleId}"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vehicles/{id}").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
